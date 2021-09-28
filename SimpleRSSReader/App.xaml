@@ -1,0 +1,16 @@
+﻿<Application x:Class="SimpleRSSReader.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:SimpleRSSReader"
+             xmlns:fa="http://schemas.fontawesome.io/icons/"
+             xmlns:common="clr-namespace:SimpleRSSReader.Common"
+             StartupUri="MainWindow.xaml">
+            
+             
+             
+    <Application.Resources>
+        <ResourceDictionary>
+            <common:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
