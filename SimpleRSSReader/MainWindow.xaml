@@ -7,110 +7,86 @@
         xmlns:local="clr-namespace:SimpleRSSReader"
         xmlns:viewModels="clr-namespace:SimpleRSSReader.ViewModels"
         xmlns:views="clr-namespace:SimpleRSSReader.Views"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        Background="{DynamicResource MaterialDesignPaper}"
+        TextElement.FontWeight="Medium"
+        TextElement.FontSize="14"
+        FontFamily="{materialDesign:MaterialDesignFont}"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
         Title="Simple RSS Reader" Height="600" Width="1000">
 
-    <Window.Resources>
-        <DataTemplate DataType="{x:Type viewModels:FeedViewModel}">
-            <views:FeedView/>
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type viewModels:NewsSourceViewModel}">
-            <views:NewsSourceView/>
-        </DataTemplate>
-    </Window.Resources>
+    <materialDesign:DrawerHost IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}">
+        <materialDesign:DrawerHost.LeftDrawerContent>
+            <StackPanel MinWidth="220">
+                <ToggleButton Style="{StaticResource MaterialDesignHamburgerToggleButton}"
+                              DockPanel.Dock="Top"
+                              HorizontalAlignment="Right"
+                              Margin="16"
+                              IsChecked="{Binding ElementName=MenuToggleButton, Path=IsChecked, Mode=TwoWay}" />
+                <TextBox x:Name="MenuItemsSearchBox"
+                         Text="{Binding SearchKeyword, UpdateSourceTrigger=PropertyChanged}"
+                         DockPanel.Dock="Top"
+                         Margin="16, 4"
+                         Width="200"
+                         materialDesign:HintAssist.Hint="Search"
+                         materialDesign:HintAssist.IsFloating="True"
+                         materialDesign:TextFieldAssist.HasClearButton="True"
+                         materialDesign:TextFieldAssist.HasOutlinedTextField="True"
+                         materialDesign:TextFieldAssist.DecorationVisibility="Collapsed"
+                         materialDesign:TextFieldAssist.TextFieldCornerRadius="4" />
+                <ListBox x:Name="MenuItemsListBox"
+                         Margin="0 16 0 16"
+                         SelectedIndex="{Binding SelectedIndex}"
+                         SelectedItem="{Binding SelectedItem, UpdateSourceTrigger=PropertyChanged}"
+                         ItemsSource="{Binding MenuItems}"
+                         PreviewMouseLeftButtonUp="UIElement_OnPreviewMouseLeftButtonUp"
+                         Style="{StaticResource MaterialDesignNavigationPrimaryListBox}">
+                    <ListBox.Resources>
+                        <Style TargetType="ScrollBar"
+                               BasedOn="{StaticResource MaterialDesignScrollBarMinimal}" />
+                    </ListBox.Resources>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate DataType="domain:DemoItem">
+                            <StackPanel Orientation="Horizontal"
+                                        VerticalAlignment="Center">
+                                <materialDesign:PackIcon Kind="{Binding IconName}" />
+                                <TextBlock Text="{Binding Name}"
+                                           Margin="20 0 0 0"
+                                           AutomationProperties.AutomationId="DemoItemPage" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
 
-    <Grid>
-
-        <Grid Margin="50,0,0,0">
-            <ContentControl x:Name="MainView"/>
-        </Grid>
-        
-        <Grid x:Name="NavigationPanel" Width="50" HorizontalAlignment="Left"
-              Background="#ececec">
-            <StackPanel>
-                <ToggleButton Height="30"
-                              Width="30"
-                              Margin="10,0,0,10"
-                              BorderThickness="0"
-                              Background="Transparent"
-                              HorizontalAlignment="Left"
-                              VerticalAlignment="Top">
-
-                    <fa:ImageAwesome Icon="Bars"/>
-
-                    <ToggleButton.Triggers>
-                        <EventTrigger RoutedEvent="ToggleButton.Unchecked">
-                            <BeginStoryboard>
-                                <Storyboard x:Name="HideStackPanel">
-                                    <DoubleAnimation Storyboard.TargetName="NavigationPanel"
-                                                     Storyboard.TargetProperty="Width"
-                                                     BeginTime="0:0:0"
-                                                     From="200" To="50"
-                                                     Duration="0:0:0.1">
-                                    </DoubleAnimation>
-                                </Storyboard>
-                            </BeginStoryboard>
-                        </EventTrigger>
-                        <EventTrigger RoutedEvent="ToggleButton.Checked">
-                            <BeginStoryboard>
-                                <Storyboard x:Name="ShowStackPanel">
-                                    <DoubleAnimation Storyboard.TargetName="NavigationPanel"
-                                                     Storyboard.TargetProperty="Width"
-                                                     BeginTime="0:0:0"
-                                                     From="50" To="200"
-                                                     Duration="0:0:0.1">
-
-                                    </DoubleAnimation>
-                                </Storyboard>
-                            </BeginStoryboard>
-                        </EventTrigger>
-                    </ToggleButton.Triggers>
-                </ToggleButton>
-                <ListView x:Name="Nav_Sidebar" 
-                          HorizontalAlignment="Left"
-                          Margin="0,0,0,15"
-                          Background="Transparent"
-                          BorderThickness="0"
-                          ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                    <ListViewItem>
-                        <Button Command="{Binding NavCommand}"
-                                CommandParameter="feed"
-                                Background="Transparent"
-                                BorderThickness="0">
-                            <StackPanel Orientation="Horizontal" Width="200" Height="40"
-                                    VerticalAlignment="Center">
-                            <fa:ImageAwesome Icon="Rss"
-                                             Height="25"
-                                             Width="25"
-                                             Margin="5,0,0,0"/>
-                            <TextBlock Text="RSS Feed" 
-                                       Margin="25,0,0,0"
-                                       FontSize="16"
-                                       VerticalAlignment="Center"/>
-                        </StackPanel>
-                        </Button>
-                    </ListViewItem>
-                    <ListViewItem x:Name="NewsSourcesLstItem">
-                        <Button Command="{Binding NavCommand}"
-                                CommandParameter="news_sources"
-                                Background="Transparent"
-                                BorderThickness="0">
-                            <StackPanel Orientation="Horizontal" Width="200" Height="40" >
-                            <fa:ImageAwesome Icon="Sitemap"
-                                             Height="25"
-                                             Width="25"
-                                             Margin="5,0,0,0"></fa:ImageAwesome>
-                            <TextBlock Text="News Sources" 
-                                       Margin="25,0,0,0"
-                                       FontSize="16"
-                                       VerticalAlignment="Center"/>
-                        </StackPanel>
-                        </Button>
-                    </ListViewItem>
-
-                </ListView>
             </StackPanel>
-        </Grid>
-    </Grid>
+        </materialDesign:DrawerHost.LeftDrawerContent>
+        <DockPanel>
+            <materialDesign:ColorZone Mode="PrimaryLight"
+                                      Padding="16"
+                                      DockPanel.Dock="Top"
+                                      materialDesign:ShadowAssist.ShadowDepth="Depth2">
+                <StackPanel Orientation="Horizontal">
+                    <ToggleButton x:Name="MenuToggleButton"
+                                  Style="{DynamicResource MaterialDesignHamburgerToggleButton}"
+                                  IsChecked="False" />
+                    <TextBlock VerticalAlignment="Center"
+                               Margin="16 0 0 0"
+                               Text="{Binding SelectedItem.Name}" />
+                </StackPanel>
+            </materialDesign:ColorZone>
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <ContentControl x:Name="MainContent"
+                                Grid.Row="1"
+                                DataContext="{Binding SelectedItem}"
+                                Content="{Binding Content, UpdateSourceTrigger=PropertyChanged, FallbackValue={x:Null}}" />
+            </Grid>
+        </DockPanel>
+    </materialDesign:DrawerHost>
 </Window>

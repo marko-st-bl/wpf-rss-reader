@@ -7,6 +7,7 @@
              xmlns:common="clr-namespace:SimpleRSSReader.Common"
              xmlns:vm="clr-namespace:SimpleRSSReader.ViewModels"
              xmlns:local="clr-namespace:SimpleRSSReader.Views"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:fa="http://schemas.fontawesome.io/icons/"
              d:DataContext="{d:DesignInstance Type=vm:NewsSourceViewModel}"
              mc:Ignorable="d" 
@@ -31,10 +32,11 @@
                 <TextBlock Grid.Row="1"
                          Grid.Column="0"
                          Text="{Binding Link}"
-                         Foreground="Black"/>
+                         Style="{StaticResource MaterialDesignCaptionTextBlock}"/>
                 <Button Width="30" Height="30"
                             Command="{Binding ElementName=Root, Path=DataContext.DeleteCommand}"
                             CommandParameter="{Binding LinkAsString}"
+                        Style="{StaticResource MaterialDesignIconButton}"
                             Grid.Column="1"
                             Grid.Row="0"
                             Grid.RowSpan="2"
@@ -42,10 +44,7 @@
                             HorizontalAlignment="Right"
                             Background="Transparent"
                         BorderThickness="0">
-                    <StackPanel Orientation="Horizontal">
-                        <fa:ImageAwesome Icon="TrashOutline"
-                                         Foreground="Red"/>
-                    </StackPanel>
+                    <materialDesign:PackIcon Kind="Delete" />
                 </Button>
             </Grid>
         </DataTemplate>
@@ -53,7 +52,7 @@
     <Grid x:Name="Root"
           Background="White">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <!-- Normal News Sources Content -->
@@ -62,24 +61,33 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0"
                        Text="News Sources"
                        FontSize="20"
-                       Margin="20,0"/>
+                       Margin="20, 10"/>
             <Rectangle Grid.Row="1"
                        Margin="20,0"
                        Height="1"
                        HorizontalAlignment="Stretch"
                        Fill="Black"/>
-            <ItemsControl x:Name="FeedSourcesList" 
-                      Grid.Row="2"
-                      ItemsSource="{Binding AllFeeds}"
-                      ItemTemplate="{StaticResource EditFeedsListItemTemplate}"/>
+            <DockPanel Grid.Row="2">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <ScrollViewer.Resources>
+                        <Style TargetType="ScrollBar"
+                               BasedOn="{StaticResource MaterialDesignScrollBarMinimal}" />
+                    </ScrollViewer.Resources>
+                    <ItemsControl x:Name="FeedSourcesList"
+                                  ItemsSource="{Binding AllFeeds}"
+                                  ItemTemplate="{StaticResource EditFeedsListItemTemplate}">
+                    
+                    </ItemsControl>
+                </ScrollViewer>
+            </DockPanel>
         </Grid>
         <!-- No news sources-->
-        <Grid Grid.Row="0"
+        <Grid Grid.Row="2"
               Visibility="{Binding HasNoFeeds, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
             <TextBlock Grid.Row="1"
                        Margin="24,12"
@@ -96,17 +104,13 @@
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0"
                        Text="Add new news source"
-                       Margin="20,0"
+                       Margin="20,10, 0, 0"
                        FontSize="20"/>
             <Rectangle Grid.Row="1"
                        Margin="20,0"
                        Height="1"
                        HorizontalAlignment="Stretch"
-                       Fill="Black"/>
-            <TextBlock Grid.Row="2"
-                       Text="Enter or paste the URL to a publication's RSS Feed below to add it to your list."
-                       Margin="20,10,20, 5"
-                       />
+                       Fill="Black" />
             <Grid Grid.Row="3"
                   Margin="20,0,0,0">
                 <Grid.RowDefinitions>
@@ -118,50 +122,36 @@
                 </Grid.RowDefinitions>
                 <TextBox x:Name="FeedLinkTextBox"
                          Grid.Row="0"
-                         Text="{Binding Link, Mode=TwoWay}"
+                         Text="{Binding Link}"
+                         Style="{DynamicResource MaterialDesignFloatingHintTextBox}"
+                         materialDesign:HintAssist.Hint="URL"
+                         materialDesign:HintAssist.HelperText="Enter or paste the URL to a publication's RSS Feed."
                          MinWidth="300"
-                         MaxWidth="500"
-                         HorizontalAlignment="Left"/>
-                <TextBlock Grid.Row="1"
-                           Text="Name"/>
+                         Margin="5"
+                         HorizontalAlignment="Left" />
                 <TextBox x:Name="FeedName"
                          Grid.Row="2"
-                         Text="{Binding Name, Mode=TwoWay}"
+                         Style="{DynamicResource MaterialDesignFloatingHintTextBox}"
+                         materialDesign:HintAssist.Hint="Name"
+                         Margin="5"
                          MinWidth="300"
-                         MaxWidth="500"
-                         HorizontalAlignment="Left"/>
+                         HorizontalAlignment="Left">
+                    <TextBox.Text>
+                        <Binding Path="Name"
+                                 UpdateSourceTrigger="PropertyChanged" />
+                    </TextBox.Text>
+                </TextBox>
                 <TextBlock Grid.Row="3"
                          Visibility="{Binding IsInError, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
                          Text="{Binding ErrorMessage}"
-                         Foreground="Red"/>
+                         Foreground="{DynamicResource PrimaryHueLightBrush}"/>
                 <Button Grid.Row="4"
                         Margin="0,10"
-                        IsEnabled="{Binding AddButtonEnabled}"
                         Content="Add"
-                        FontSize="16"
-                        FontWeight="Bold"
+                        Style="{StaticResource MaterialDesignOutlinedButton}"
                         HorizontalAlignment="Left"
-                        Command="{Binding AddCommand}"
-                        Background="Transparent"
-                        BorderBrush="Green"
-                        Foreground="Green"
-                        BorderThickness="2"
-                        Padding="5">
-                    <Button.Resources>
-                        <Style TargetType="Border">
-                            <Setter Property="CornerRadius" Value="5"/>
-                            <Style.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="Background" Value="Green"/>
-                                    <Setter Property="TextBlock.Foreground" Value="White"/>
-                                </Trigger>
-                                <Trigger Property="IsMouseOver" Value="False">
-                                    <Setter Property="Background" Value="Transparent"/>
-                                    <Setter Property="TextBlock.Foreground" Value="Green"/>
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Resources>
+                        IsEnabled="{Binding AddButtonEnabled}"
+                        Command="{Binding AddCommand}">
                 </Button>
             </Grid>
         </Grid>

@@ -1,5 +1,7 @@
 ﻿using RssReader.Common;
+using SimpleRSSReader.Common;
 using SimpleRSSReader.Models;
+using SimpleRSSReader.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -12,18 +14,20 @@ namespace SimpleRSSReader.ViewModels
 {
     class NewsSourceViewModel : BindableBase
     {
-        public NewsSourceViewModel()
+        private SessionContext _context;
+        public NewsSourceViewModel(SessionContext context)
         {
             DeleteCommand = new MyCommand<string>(OnDelete);
             AddCommand = new MyCommand<string>(OnAdd);
+            _context = context;
+            AllFeeds = new ObservableCollection<Feed>(_context.Feeds);
             AllFeeds.CollectionChanged += (s, e) =>
             {
                 OnPropertyChanged(nameof(HasNoFeeds));
             };
 
         }
-        public ObservableCollection<Feed> AllFeeds { get; set; } = new ObservableCollection<Feed>();
-        public Feed NewFeed { get; set; } = new Feed();
+        public ObservableCollection<Feed> AllFeeds { get; set; }
         public MyCommand<string> DeleteCommand { get; private set; }
         public MyCommand<string> AddCommand { get; private set; }
         public bool HasNoFeeds => AllFeeds.Count == 0;
@@ -43,8 +47,9 @@ namespace SimpleRSSReader.ViewModels
                 }
                 if (AllFeeds.Remove(feedToDelete))
                 {
-                    Console.WriteLine($"OnDelete: {feedLinkToDelete} is deleted.");
                     FeedsDataSource.saveAsync(AllFeeds);
+                    MenuItem menuItemToDelete = _context.MenuItems.Where(mi => mi.Name == feedToDelete.Name).First();
+                    _context.MenuItems.Remove(menuItemToDelete);
                 }
                 else
                 {
@@ -61,6 +66,13 @@ namespace SimpleRSSReader.ViewModels
                 feed.LinkAsString = Link;
                 feed.Name = Name;
                 AllFeeds.Add(feed);
+                _context.Feed = feed;
+                _context.MenuItems.Add(new MenuItem(
+                    feed.Name,
+                    "Rss",
+                    typeof(FeedView),
+                    _context
+                    ));
                 FeedsDataSource.saveAsync(AllFeeds);
                 _name = "";
                 _link = "";

@@ -14,6 +14,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Web.WebView2.Core;
+using SimpleRSSReader.Common;
+using SimpleRSSReader.ViewModels;
 
 namespace SimpleRSSReader.Views
 {
@@ -22,9 +24,10 @@ namespace SimpleRSSReader.Views
     /// </summary>
     public partial class FeedView : UserControl
     {
-        public FeedView()
+        public FeedView(SessionContext context = null)
         {
             InitializeComponent();
+            DataContext = new FeedViewModel(context);
         }
 
         private void LstOnSelectionChanged(object sender, SelectionChangedEventArgs e)

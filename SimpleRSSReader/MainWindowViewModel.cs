@@ -1,70 +1,97 @@
 ﻿using RssReader.Common;
+using SimpleRSSReader.Common;
 using SimpleRSSReader.Models;
 using SimpleRSSReader.ViewModels;
+using SimpleRSSReader.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
+using System.Windows.Data;
 
 namespace SimpleRSSReader
 {
     public class MainWindowViewModel : BindableBase
     {
-        public ObservableCollection<Feed> Feeds { get; }
+        public ObservableCollection<Feed> Feeds { get; } = new ObservableCollection<Feed>();
+
         public MainWindowViewModel()
         {
-            NavCommand = new MyCommand<string>(OnNav);
-            CurrentViewModel = feedViewModel;
+            _context = new SessionContext();
+            MenuItems = _context.MenuItems;
 
+            _menuItemsView = CollectionViewSource.GetDefaultView(MenuItems);
+            _menuItemsView.Filter = MenuItemsFilter;
         }
 
-
-        private FeedViewModel feedViewModel = new FeedViewModel();
-        private NewsSourceViewModel newsSourceViewModel = new NewsSourceViewModel();
-        public ObservableCollection<Article> Articles { get; set; }
-
-        private BindableBase _CurrentViewModel;
-        public BindableBase CurrentViewModel { get { return _CurrentViewModel; } set { SetProperty(ref _CurrentViewModel, value); } }
-        public MyCommand<string> NavCommand { get; private set; }
-        private void OnNav(string dest)
+        private readonly ICollectionView _menuItemsView;
+        private string _searchKeyword;
+        public string SearchKeyword
         {
-            Console.WriteLine($"OnNav: {dest}");
-            switch (dest)
+            get => _searchKeyword;
+            set
             {
-                case "feed":
-                    CurrentViewModel = feedViewModel;
-                    MainWindow.Current.MainView.Content = feedViewModel;
-                    break;
-                case "news_sources":
-                    CurrentViewModel = newsSourceViewModel;
-                    MainWindow.Current.MainView.Content = newsSourceViewModel;
-                    break;
-                default:
-                    CurrentViewModel = feedViewModel;
-                    break;
+                if (SetProperty(ref _searchKeyword, value))
+                {
+                    _menuItemsView.Refresh();
+                }
             }
         }
 
+        public ObservableCollection<Article> Articles { get; set; }
 
         public async Task InitializeFeedsAsync()
         {
-            feedViewModel.IsLoading = true;
-            (await FeedsDataSource.GetFeedsAsync()).ForEach(feed => newsSourceViewModel.AllFeeds.Add(feed));
-            foreach (var feed in newsSourceViewModel.AllFeeds)
+            //feedViewModel.IsLoading = true;
+            (await FeedsDataSource.GetFeedsAsync()).ForEach(feed => Feeds.Add(feed));
+            foreach (var feed in Feeds)
             {
-                //Console.WriteLine(feed.Name);
-                await FeedsDataSource.GetFeedAsync(feed);
-                foreach(var article in feed.Articles)
-                {
-                    feedViewModel.AllArticles.Add(article);
-                }
+                MenuItems.Add(new MenuItem(
+                feed.Name,
+                "Rss",
+                typeof(FeedView),
+                new SessionContext() { Feed = feed }
+                ));
+                _context.Feeds.Add(feed);
             }
-            feedViewModel.SelectedArticle = feedViewModel.AllArticles.Count == 0 ? null : feedViewModel.AllArticles[0];
-            feedViewModel.IsLoading = false;
+            MenuItems.Add(new MenuItem(
+                "Sources",
+                "SourceBranch",
+                typeof(NewsSourceView),
+                _context
+                ));
+        }
+
+        //NEW
+        private SessionContext _context;
+        private MenuItem _selectedItem;
+        private int _selectedIndex;
+
+        public ObservableCollection<MenuItem> MenuItems { get; }
+        public MenuItem SelectedItem
+        {
+            get => _selectedItem;
+            set => SetProperty(ref _selectedItem, value);
+        }
+
+        public int SelectedIndex
+        {
+            get => _selectedIndex;
+            set => SetProperty(ref _selectedIndex, value);
+        }
+
+        private bool MenuItemsFilter(object obj)
+        {
+            if (string.IsNullOrWhiteSpace(_searchKeyword))
+            {
+                return true;
+            }
+
+            return obj is MenuItem item
+                   && item.Name.ToLower().Contains(_searchKeyword.ToLower());
         }
 
     }

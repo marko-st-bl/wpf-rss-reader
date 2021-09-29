@@ -1,4 +1,6 @@
-﻿using SimpleRSSReader.Models;
+﻿using SimpleRSSReader.Common;
+using SimpleRSSReader.Models;
+using SimpleRSSReader.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,9 +23,9 @@ namespace SimpleRSSReader.Views
     /// </summary>
     public partial class NewsSourceView : UserControl
     {
-        MainWindowViewModel ViewModel = MainWindow.Current.MainViewModel;
-        public NewsSourceView()
+        public NewsSourceView(SessionContext context = null)
         {
+            DataContext =  new NewsSourceViewModel(context);
             InitializeComponent();
         }
     }

@@ -66,10 +66,7 @@ namespace SimpleRSSReader.Models
             {
                 if (SetProperty(ref _isLoading, value))
                 {
-                    //OnPropertyChanged(nameof(IsInError));
                     OnPropertyChanged(nameof(IsLoadingAndNotEmpty));
-                    //OnPropertyChanged(nameof(IsInErrorAndEmpty));
-                    //OnPropertyChanged(nameof(IsInErrorAndNotEmpty));
                 }
             }
         }
