@@ -57,22 +57,23 @@
         </Grid.RowDefinitions>
         <!-- Normal News Sources Content -->
         <Grid Grid.Row="0"
-              Visibility="{Binding HasNoFeeds, Mode=OneWay, ConverterParameter=Reverse, Converter={StaticResource BooleanToVisibilityConverter}}">
+              >
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0"
                        Text="News Sources"
                        FontSize="20"
-                       Margin="20, 10"/>
+                       Margin="20, 10" />
             <Rectangle Grid.Row="1"
                        Margin="20,0"
                        Height="1"
                        HorizontalAlignment="Stretch"
-                       Fill="Black"/>
-            <DockPanel Grid.Row="2">
+                       Fill="Black" />
+            <DockPanel Grid.Row="2"
+                       Visibility="{Binding HasNoFeeds, Mode=OneWay, ConverterParameter=Reverse, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <ScrollViewer.Resources>
                         <Style TargetType="ScrollBar"
@@ -81,19 +82,19 @@
                     <ItemsControl x:Name="FeedSourcesList"
                                   ItemsSource="{Binding AllFeeds}"
                                   ItemTemplate="{StaticResource EditFeedsListItemTemplate}">
-                    
+
                     </ItemsControl>
                 </ScrollViewer>
             </DockPanel>
-        </Grid>
-        <!-- No news sources-->
-        <Grid Grid.Row="2"
-              Visibility="{Binding HasNoFeeds, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
-            <TextBlock Grid.Row="1"
-                       Margin="24,12"
-                       Text="Looks like you don't have feeds at the moment. You can add them below."
-                       TextWrapping="Wrap"
-                       Foreground="Red"/>
+            <!-- No news sources-->
+            <Grid Grid.Row="2"
+                  Visibility="{Binding HasNoFeeds, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <TextBlock Grid.Row="1"
+                           Margin="24,12"
+                           Text="Looks like you don't have feeds at the moment. You can add them below."
+                           TextWrapping="Wrap"
+                           Foreground="{DynamicResource MaterialDesignPrimaryHueLightBrush}" />
+            </Grid>
         </Grid>
         <Grid Grid.Row="1">
             <Grid.RowDefinitions>
