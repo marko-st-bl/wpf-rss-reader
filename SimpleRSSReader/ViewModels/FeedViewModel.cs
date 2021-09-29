@@ -17,7 +17,10 @@ namespace SimpleRSSReader.ViewModels
         {
             _context = context;
             AllArticles = new ObservableCollection<Article>();
-            LoadArticlesAsync();
+            if(AllArticles.Count == 0)
+            {
+                _ = LoadArticlesAsync();
+            }
         }
         public ObservableCollection<Article> AllArticles { get; }
         public Article SelectedArticle
@@ -40,27 +43,12 @@ namespace SimpleRSSReader.ViewModels
             }
         }
 
-        /* public async Task InitializeFeedsAsync()
-         {
-             IsLoading = true;
-             (await FeedsDataSource.GetFeedsAsync()).ForEach(feed => newsSourceViewModel.AllFeeds.Add(feed));
-             foreach (var feed in newsSourceViewModel.AllFeeds)
-             {
-                 //Console.WriteLine(feed.Name);
-                 await FeedsDataSource.GetFeedAsync(feed);
-                 foreach (var article in feed.Articles)
-                 {
-                     feedViewModel.AllArticles.Add(article);
-                 }
-             }
-             feedViewModel.SelectedArticle = feedViewModel.AllArticles.Count == 0 ? null : feedViewModel.AllArticles[0];
-             feedViewModel.IsLoading = false;
-         }*/
         public ObservableCollection<Feed> AllFeeds { get; set; } = new ObservableCollection<Feed>();
 
         public async Task LoadArticlesAsync()
         {
             IsLoading = true;
+            _context.Feed.Articles.Clear();
             await FeedsDataSource.GetFeedAsync(_context.Feed);
             foreach (var article in _context.Feed.Articles)
             {

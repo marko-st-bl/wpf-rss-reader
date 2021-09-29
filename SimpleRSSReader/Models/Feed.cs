@@ -1,12 +1,7 @@
 ﻿using RssReader.Common;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Linq.Expressions;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SimpleRSSReader.Models
 {
@@ -30,18 +25,12 @@ namespace SimpleRSSReader.Models
 
                 if (!value.Trim().StartsWith("http://") && !value.Trim().StartsWith("https://"))
                 {
-                    // IsInError = true;
-                    // ErrorMessage = NOT_HTTP_MESSAGE;
+                    return;
                 }
                 else
                 {
                     Uri uri = null;
                     if (Uri.TryCreate(value.Trim(), UriKind.Absolute, out uri)) Link = uri;
-                    else
-                    {
-                      //  IsInError = true;
-                       // ErrorMessage = INVALID_URL_MESSAGE;
-                    }
                 }
             }
         }
