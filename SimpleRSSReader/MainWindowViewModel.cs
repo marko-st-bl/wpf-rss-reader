@@ -45,7 +45,6 @@ namespace SimpleRSSReader
 
         public async Task InitializeFeedsAsync()
         {
-            //feedViewModel.IsLoading = true;
             (await FeedsDataSource.GetFeedsAsync()).ForEach(feed => Feeds.Add(feed));
             foreach (var feed in Feeds)
             {
@@ -65,7 +64,7 @@ namespace SimpleRSSReader
                 ));
         }
 
-        //NEW
+        
         private SessionContext _context;
         private MenuItem _selectedItem;
         private int _selectedIndex;

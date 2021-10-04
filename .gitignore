@@ -13,3 +13,5 @@ bld/
 [Ll]og/
 [Ll]ogs/
 .vs/
+
+.packages/

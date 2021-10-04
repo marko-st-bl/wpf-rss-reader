@@ -50,6 +50,7 @@ namespace SimpleRSSReader.ViewModels
                     FeedsDataSource.saveAsync(AllFeeds);
                     MenuItem menuItemToDelete = _context.MenuItems.Where(mi => mi.Name == feedToDelete.Name).First();
                     _context.MenuItems.Remove(menuItemToDelete);
+                    _context.Feeds.Remove(feedToDelete);
                 }
                 else
                 {
